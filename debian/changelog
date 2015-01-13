@@ -1,0 +1,19 @@
+nutcracker (0.4.0+dfsg-1+wm1) trusty-wikimedia; urgency=medium
+
+  * Added patch to allow setting of permissions on the unix socket 
+
+ -- Giuseppe Lavagetto <glavagetto@wikimedia.org>  Tue, 13 Jan 2015 12:23:30 +0100
+
+nutcracker (0.4.0+dfsg-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Switch debian/watch to GitHub instead of Google Code, as this is
+    apparently where new tarballs are being shipped nowadays.
+
+ -- Faidon Liambotis <paravoid@debian.org>  Tue, 21 Oct 2014 03:26:49 +0300
+
+nutcracker (0.3.0+dfsg-1) unstable; urgency=medium
+
+  * Initial release. (Closes: #712107)
+
+ -- Faidon Liambotis <paravoid@debian.org>  Mon, 06 Oct 2014 20:02:52 +0300

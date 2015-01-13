@@ -1,0 +1,97 @@
+Description: Allow file permissions to be set for UNIX domain listening socket
+Author: Ori Livneh <ori@wikimedia.org>
+Origin: https://github.com/twitter/twemproxy/pull/311
+Last-Update: 2015-01-12
+
+--- a/src/nc_conf.c
++++ b/src/nc_conf.c
+@@ -261,6 +261,7 @@
+     sp->family = cp->listen.info.family;
+     sp->addrlen = cp->listen.info.addrlen;
+     sp->addr = (struct sockaddr *)&cp->listen.info.addr;
++    sp->perm = cp->listen.perm;
+ 
+     sp->key_hash_type = cp->hash;
+     sp->key_hash = hash_algos[cp->hash];
+@@ -1420,8 +1421,32 @@
+     }
+ 
+     if (value->data[0] == '/') {
+-        name = value->data;
+-        namelen = value->len;
++        uint8_t *q, *start, *perm;
++        uint32_t permlen;
++
++
++        /* parse "socket_path permissions" from the end */
++        p = value->data + value->len -1;
++        start = value->data;
++        q = nc_strrchr(p, start, ' ');
++        if (q == NULL) {
++            /* no permissions field, so use defaults */
++            name = value->data;
++            namelen = value->len;
++        } else {
++            perm = q + 1;
++            permlen = (uint32_t)(p - perm + 1);
++
++            p = q - 1;
++            name = start;
++            namelen = (uint32_t)(p - start + 1);
++
++            errno = 0;
++            field->perm = (mode_t)strtol((char *)perm, NULL, 8);
++            if (errno || field->perm > 0777) {
++                return "has an invalid file permission in \"socket_path permission\" format string";
++            }
++        }
+     } else {
+         uint8_t *q, *start, *port;
+         uint32_t portlen;
+--- a/src/nc_conf.h
++++ b/src/nc_conf.h
+@@ -58,6 +58,7 @@
+     struct string   pname;   /* listen: as "name:port" */
+     struct string   name;    /* name */
+     int             port;    /* port */
++    mode_t          perm;    /* socket permissions */
+     struct sockinfo info;    /* listen socket info */
+     unsigned        valid:1; /* valid? */
+ };
+--- a/src/nc_proxy.c
++++ b/src/nc_proxy.c
+@@ -15,6 +15,7 @@
+  * limitations under the License.
+  */
+ 
++#include <sys/stat.h>
+ #include <sys/un.h>
+ 
+ #include <nc_core.h>
+@@ -148,6 +149,16 @@
+         return NC_ERROR;
+     }
+ 
++    if (p->family == AF_UNIX && pool->perm) {
++        struct sockaddr_un *un = (struct sockaddr_un *)p->addr;
++        status = chmod(un->sun_path, pool->perm);
++        if (status < 0) {
++            log_error("chmod on p %d on addr '%.*s' failed: %s", p->sd,
++                      pool->addrstr.len, pool->addrstr.data, strerror(errno));
++            return NC_ERROR;
++        }
++    }
++
+     status = listen(p->sd, pool->backlog);
+     if (status < 0) {
+         log_error("listen on p %d on addr '%.*s' failed: %s", p->sd,
+--- a/src/nc_server.h
++++ b/src/nc_server.h
+@@ -106,6 +106,7 @@
+     int                family;               /* socket family */
+     socklen_t          addrlen;              /* socket length */
+     struct sockaddr    *addr;                /* socket address (ref in conf_pool) */
++    mode_t             perm;                 /* socket permission */
+     int                dist_type;            /* distribution type (dist_type_t) */
+     int                key_hash_type;        /* key hash type (hash_type_t) */
+     hash_t             key_hash;             /* key hasher */
