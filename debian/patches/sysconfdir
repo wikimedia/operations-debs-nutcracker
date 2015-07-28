@@ -17,7 +17,6 @@ Last-Update: 2014-06-23
  
  AM_CPPFLAGS =
  if !OS_SOLARIS
-
 --- a/src/nc.c
 +++ b/src/nc.c
 @@ -28,19 +28,16 @@
@@ -41,7 +40,7 @@ Last-Update: 2014-06-23
  #define NC_MBUF_SIZE        MBUF_SIZE
  #define NC_MBUF_MIN_SIZE    MBUF_MIN_SIZE
  #define NC_MBUF_MAX_SIZE    MBUF_MAX_SIZE
-@@ -298,7 +295,7 @@ nc_set_default_options(struct instance *
+@@ -298,7 +295,7 @@
      nci->mbuf_chunk_size = NC_MBUF_SIZE;
  
      nci->pid = (pid_t)-1;

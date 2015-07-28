@@ -1,3 +1,9 @@
+nutcracker (0.4.1-1+wm1) trusty-wikimedia; urgency=medium
+
+  * Imported Upstream version 0.4.1
+
+ -- Ori Livneh <ori@wikimedia.org>  Tue, 28 Jul 2015 19:13:21 +0000
+
 nutcracker (0.4.0+dfsg-1+wm1) trusty-wikimedia; urgency=medium
 
   * Added patch to allow setting of permissions on the unix socket 
