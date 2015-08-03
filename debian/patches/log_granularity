@@ -1,0 +1,80 @@
+--- a/src/nc_core.c
++++ b/src/nc_core.c
+@@ -193,7 +193,7 @@
+ 
+     status = conn->recv(ctx, conn);
+     if (status != NC_OK) {
+-        log_debug(LOG_INFO, "recv on %c %d failed: %s",
++        log_debug(LOG_NOTICE, "recv on %c %d failed: %s",
+                   conn->client ? 'c' : (conn->proxy ? 'p' : 's'), conn->sd,
+                   strerror(errno));
+     }
+@@ -208,7 +208,7 @@
+ 
+     status = conn->send(ctx, conn);
+     if (status != NC_OK) {
+-        log_debug(LOG_INFO, "send on %c %d failed: status: %d errno: %d %s",
++        log_debug(LOG_NOTICE, "send on %c %d failed: status: %d errno: %d %s",
+                   conn->client ? 'c' : (conn->proxy ? 'p' : 's'), conn->sd,
+                   status, errno, strerror(errno));
+     }
+@@ -297,7 +297,7 @@
+             return;
+         }
+ 
+-        log_debug(LOG_INFO, "req %"PRIu64" on s %d timedout", msg->id, conn->sd);
++        log_debug(LOG_NOTICE, "req %"PRIu64" on s %d timedout", msg->id, conn->sd);
+ 
+         msg_tmo_delete(msg);
+         conn->err = ETIMEDOUT;
+--- a/src/nc_response.c
++++ b/src/nc_response.c
+@@ -193,7 +193,7 @@
+      * and eject the server if it exceeds the failure_limit
+      */
+     if (msg->failure(msg)) {
+-        log_debug(LOG_INFO, "server failure rsp %"PRIu64" len %"PRIu32" "
++        log_debug(LOG_NOTICE, "server failure rsp %"PRIu64" len %"PRIu32" "
+                   "type %d on s %d", msg->id, msg->mlen, msg->type, conn->sd);
+         rsp_put(msg);
+ 
+--- a/src/nc_server.c
++++ b/src/nc_server.c
+@@ -292,7 +292,7 @@
+ 
+     next = now + pool->server_retry_timeout;
+ 
+-    log_debug(LOG_INFO, "update pool %"PRIu32" '%.*s' to delete server '%.*s' "
++    log_debug(LOG_NOTICE, "update pool %"PRIu32" '%.*s' to delete server '%.*s' "
+               "for next %"PRIu32" secs", pool->idx, pool->name.len,
+               pool->name.data, server->pname.len, server->pname.data,
+               pool->server_retry_timeout / 1000 / 1000);
+--- a/src/proto/nc_memcache.c
++++ b/src/proto/nc_memcache.c
+@@ -733,7 +733,7 @@
+     r->result = MSG_PARSE_ERROR;
+     r->state = state;
+ 
+-    log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "out of memory on parse req %"PRIu64" "
++    log_hexdump(LOG_NOTICE, b->pos, mbuf_length(b), "out of memory on parse req %"PRIu64" "
+                 "res %d type %d state %d", r->id, r->result, r->type, r->state);
+ 
+     return;
+@@ -743,7 +743,7 @@
+     r->state = state;
+     errno = EINVAL;
+ 
+-    log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "parsed bad req %"PRIu64" "
++    log_hexdump(LOG_NOTICE, b->pos, mbuf_length(b), "parsed bad req %"PRIu64" "
+                 "res %d type %d state %d", r->id, r->result, r->type,
+                 r->state);
+ }
+@@ -1195,7 +1195,7 @@
+     r->state = state;
+     errno = EINVAL;
+ 
+-    log_hexdump(LOG_INFO, b->pos, mbuf_length(b), "parsed bad rsp %"PRIu64" "
++    log_hexdump(LOG_NOTICE, b->pos, mbuf_length(b), "parsed bad rsp %"PRIu64" "
+                 "res %d type %d state %d", r->id, r->result, r->type,
+                 r->state);
+ }
