@@ -2,7 +2,7 @@ Source: nutcracker
 Section: net
 Priority: optional
 Maintainer: Faidon Liambotis <paravoid@debian.org>
-Build-Depends: debhelper (>= 9), dh-autoreconf, libyaml-dev
+Build-Depends: debhelper (>= 9), dh-autoreconf, libyaml-dev, dh-systemd
 Standards-Version: 3.9.6
 Homepage: https://github.com/twitter/twemproxy
 Vcs-Git: git://anonscm.debian.org/collab-maint/nutcracker.git

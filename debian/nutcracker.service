@@ -1,0 +1,16 @@
+[Unit]
+Description=Nutcracker memcached/redis proxy
+After=network.target
+ConditionPathExists=/etc/nutcracker/nutcracker.yml
+
+[Service]
+User=nutcracker
+Group=nutcracker
+Environment=DAEMON_OPTS=""
+EnvironmentFile=-/etc/default/nutcracker
+ExecStartPre=/usr/sbin/nutcracker -t $DAEMON_OPTS
+ExecStart=/usr/sbin/nutcracker $DAEMON_OPTS
+
+[Install]
+WantedBy=multi-user.target
+
